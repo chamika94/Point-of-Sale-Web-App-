@@ -81,8 +81,7 @@ const AutoComplete = ({ data, onSelect }) => {
             onSelect(suggestions[cursor]);
             setSearch("");
         }
-    };
-
+    }; 
     return (
         <div style={{ height: "100%" }} ref={searchContainer}>
             <input

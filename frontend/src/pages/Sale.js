@@ -35,7 +35,8 @@ const initialCountryData = {
 };
 
 const initialItemstate = {
-  items : []
+  items : [],
+  total : 0
 }
 
 const Sale = () => {
@@ -47,6 +48,7 @@ const navigate = useNavigate();
 const [itemState, setItemState] = useState(initialItemstate);
 const [country, setcountry] = useState(initialCountryData); 
 const {title, price} = country;
+const {total, items} = itemState;
 
 
 const [addItemModal, setAddItemModal] = useState(false)  
@@ -73,22 +75,32 @@ useEffect(() => {
   
   if(title!==""){
     setAddItemModal(true);
-  }
- 
+  };
 }, [country]);
 
 const onInputChange = (e) =>{
     let {name,value} = e.target;
     setItemData({...itemData,[name]:value});
 };
+const handleCheckOut1 = () => {
+  var items = itemState.items;
+  var totalCost = 0;
+  for (var i = 0; i < items.length; i++) {
+    var price = items[i].itemPrice * items[i].quantity;
+    totalCost = parseInt(totalCost, 10) + parseInt(price, 10);
+  }
+  setItemState({ ...itemState,total: totalCost });
+  
+};
 
 const  handleSubmit = (e) => {
     e.preventDefault();
     setAddItemModal(false);
+    //setItemState({...itemState,total:total+price});
     //console.log("resp1",itemData);
     itemState.items.push(itemData);
-   // console.log("resp2",state.items);
-
+    
+    
   };
 
 const handleCheckout = () => {
@@ -133,17 +145,35 @@ const renderModal = () => {
       </Modal>
     );
   };
+
+  const handleChange = (id, value) => {
+    var items = itemState.items;
+    if (value === "delete") {
+      var newitems = items.filter(function(item) {
+        return item.id !== id;
+      });
+      setItemState({ items: newitems });
+     
+     // console.log("resp",newitems);
+    }
+    
+  };
+
+
   const renderLivePos = () => {
    // console.log("resp3",state.items);
     if (itemState.items.length === 0) {
       return <tr style={{textAlign:"center"}}><p> No products added</p></tr>
     } else {
         return itemState.items.map(
-            item => <LivePos {...item} />
+            item => <LivePos data={item} onChange={handleChange}/>
             
           );
     }
   };
+  useEffect(() => {
+    handleCheckOut1();
+  }, [{handleSubmit, handleChange}]);
   return (
     <div>
       
@@ -155,14 +185,17 @@ const renderModal = () => {
                  <tr>
                 <td colspan="6" className="text-center">
                   <span className="pull-left">
-                    <button
+                   {/* <button
                       onClick={() => setAddItemModal(true)}
                       className="btn btn-default btn-sm"
                     >
                      <BsAlignMiddle/> Add Item
-                    </button>
-                  </span>
+                    </button>*/}
 
+                    {total && total ? (<div style={{width:"40%",height:"50px",fontSize:"27px"}} className="mb-0 badge badge-primary">Total : <b>{total}</b> </div>) : 
+                      (<div style={{width:"40%",height:"50px",fontSize:"27px"}} className="mb-0 badge badge-primary">Total : <b> 0 </b> </div>)
+                    }
+                  </span>
                 </td>
               </tr>
                  </thead>
@@ -180,7 +213,6 @@ const renderModal = () => {
                     <div className="d-flex justify-content-center mb-3">
                         <div className="search-bar-container">
                            <AutoComplete data={tours}  onSelect={country => setcountry(country)}/>
-
                         </div>
                     </div>
                 </div>
