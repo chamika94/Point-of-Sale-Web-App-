@@ -54,7 +54,12 @@ const {total, items} = itemState;
 const [addItemModal, setAddItemModal] = useState(false)  
 const [itemData, setItemData] = useState(initialItemData);    
 const {id, itemName, quantity, itemPrice} = itemData;
+const modalReference = useRef(null);
 const inputReference = useRef(null);
+
+useEffect(() => {
+  inputReference.current.focus();
+}, []);
 
   useEffect(() => {
     dispatch(getTours());
@@ -96,22 +101,21 @@ const handleCheckOut1 = () => {
 const  handleSubmit = (e) => {
     e.preventDefault();
     setAddItemModal(false);
-    //setItemState({...itemState,total:total+price});
     //console.log("resp1",itemData);
     itemState.items.push(itemData);
-    
-    
+     
   };
 
 const handleCheckout = () => {
       var items = itemState.items;
       dispatch(createTransaction({items, toast, navigate}));
       setItemState({items:[]});
+      inputReference.current.focus();
 }
   
 const renderModal = () => {
     return (
-      <Modal show={addItemModal} onEntered={() => inputReference.current.focus()}>
+      <Modal show={addItemModal} onEntered={() => modalReference.current.focus()}>
         <Modal.Header closeButton>
           <Modal.Title>Add Quantity</Modal.Title>
         </Modal.Header>
@@ -125,7 +129,7 @@ const renderModal = () => {
                       type="number"
                       name="quantity"
                       value={quantity}
-                      ref={inputReference}
+                      ref={modalReference}
                       onChange={onInputChange}
                       placeholder="Enter Quantity"
                   />
@@ -153,7 +157,7 @@ const renderModal = () => {
         return item.id !== id;
       });
       setItemState({ items: newitems });
-     
+      inputReference.current.focus();
      // console.log("resp",newitems);
     }
     
@@ -163,7 +167,7 @@ const renderModal = () => {
   const renderLivePos = () => {
    // console.log("resp3",state.items);
     if (itemState.items.length === 0) {
-      return <tr style={{textAlign:"center"}}><p> No products added</p></tr>
+      return <tr style={{textAlign:"center"}}><td></td><td></td><td><p> No products added</p></td><td></td><td></td><td></td></tr>
     } else {
         return itemState.items.map(
             item => <LivePos data={item} onChange={handleChange}/>
@@ -212,7 +216,7 @@ const renderModal = () => {
 
                     <div className="d-flex justify-content-center mb-3">
                         <div className="search-bar-container">
-                           <AutoComplete data={tours}  onSelect={country => setcountry(country)}/>
+                           <AutoComplete data={tours}  onSelect={country => setcountry(country)}  inputRef={inputReference} saveData={handleCheckout}/>
                         </div>
                     </div>
                 </div>

@@ -1,19 +1,20 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import AutoCompleteItem from "../components/AutoCompleteItem";
-const AutoComplete = ({ data, onSelect }) => {
+const AutoComplete = ({ data, onSelect, inputRef, saveData}) => {
     const [isVisbile, setVisiblity] = useState(false);
     const [search, setSearch] = useState("");
     const [cursor, setCursor] = useState(-1);
 
     const searchContainer = useRef(null);
     const searchResultRef = useRef(null);
-    const inputReference = useRef(null);
+    //const inputReference = useRef(null);
+
+   {/* useEffect(() => {
+      inputReference.current.focus();
+    }, []);*/}
 
     useEffect(() => {
-      inputReference.current.focus();
-    }, []);
-    useEffect(() => {
-        window.addEventListener("mousedown", handleClickOutside);
+           window.addEventListener("mousedown", handleClickOutside);
 
         return () => {
             window.removeEventListener("mousedown", handleClickOutside);
@@ -41,9 +42,9 @@ const AutoComplete = ({ data, onSelect }) => {
 
         setCursor(-1);
         scrollIntoView(0);
-
-        return data.filter(item =>
-            item.title.toLowerCase().includes(search.toLowerCase())
+        
+        return data.filter( item =>
+           item.code.toLowerCase().includes(search.toLowerCase()) || item.tags[0].toLowerCase().includes(search.toLowerCase()) || item.price.toString().includes(search)
         );
     }, [data, search]);
 
@@ -71,8 +72,9 @@ const AutoComplete = ({ data, onSelect }) => {
             setCursor(c => (c > 0 ? c - 1 : 0));
         }
 
-        if (e.key === "Escape") {
+        if (e.key === "Tab") {
             hideSuggestion();
+           // inputRef.current.focus();
         }
 
         if (e.key === "Enter" && cursor >= 0) {
@@ -80,6 +82,9 @@ const AutoComplete = ({ data, onSelect }) => {
             hideSuggestion();
             onSelect(suggestions[cursor]);
             setSearch("");
+        }
+        if (e.key === "Escape") {
+            saveData();
         }
     }; 
     return (
@@ -89,7 +94,7 @@ const AutoComplete = ({ data, onSelect }) => {
                 name="search"
                 className="search-bar"
                 autoComplete="off"
-                ref={inputReference}
+                ref={inputRef}
                 value={search}
                 onClick={showSuggestion}
                 onChange={e => setSearch(e.target.value)}

@@ -59,7 +59,7 @@ const CardTour = ({
 
           <MDBCardText className="text-start">
             
-            <Link to={`/tour/${_id}`}>Read More</Link>
+            <Link to={`/tour/${_id}`}>read more..</Link>
           </MDBCardText>
           
         </MDBCardBody>

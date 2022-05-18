@@ -12,10 +12,8 @@ const AutoCompleteItem = ({title, price, code, tags, imageFile, onSelectItem, is
             <div className="row">
                 <div className="col text-left">
                     <p className="mb-0 font-weight-bold line-height-1">
-                        {title}{" "}
-                        
-                        <img src={imageFile} alt="" style={{ width: "60px",marginLeft:"50%" }} />
-                    </p>
+                        <img src={imageFile} alt="" style={{ width: "60px",marginLeft:"-70%" }} />
+                    </p>                    
                     <div style={{marginTop:"-50px"}}>
                     <p>{tags}</p>
                     <p className="mb-0 badge badge-primary">{price} LKR</p>
