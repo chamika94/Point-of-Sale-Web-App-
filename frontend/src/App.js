@@ -3,6 +3,7 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Sale from './pages/Sale';
+import Payment from './pages/Payment';
 import Register from './pages/Register';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -57,6 +58,7 @@ function App() {
                         </PrivateRoute>
                         }/>    
                         <Route path="/sale" element={<Sale/>}/>   
+                        <Route path="/payment" element={<Payment/>}/>   
                       </Routes> 
 
    

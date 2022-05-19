@@ -36,26 +36,64 @@ const initialCountryData = {
 
 const initialItemstate = {
   items : [],
-  total : 0
+  total : 0,
+  changeDue : 0,
+  totalPayment : 0,
 }
 
 const Sale = () => {
-
 
 const dispatch = useDispatch();
 const navigate = useNavigate();
 
 const [itemState, setItemState] = useState(initialItemstate);
 const [country, setcountry] = useState(initialCountryData); 
+
 const {title, price} = country;
-const {total, items} = itemState;
+const {total, items, totalPayment, changeDue } = itemState;
+
+const [itemData, setItemData] = useState(initialItemData); 
+const [addItemModal, setAddItemModal] = useState(false);
+const [checkOutModal, setCheckOutModal] = useState(false);   
+const [receiptModal, setReceiptModal] = useState(false);
+const [amountDueModal, setAmountDueModal] = useState(false);
 
 
-const [addItemModal, setAddItemModal] = useState(false)  
-const [itemData, setItemData] = useState(initialItemData);    
 const {id, itemName, quantity, itemPrice} = itemData;
 const modalReference = useRef(null);
 const inputReference = useRef(null);
+const paymentModalReference = useRef(null);
+
+useEffect(() => {
+  document.addEventListener('keydown', detectKeyDown, true)
+}, []);
+
+const detectKeyDown = (e) => {
+      if(e.key === "F2"){
+        if(itemState.items.length>0){
+          navigate('/payment');
+        }else{
+          toast.warning("Nothing to checkout.!");
+        }
+        
+      }
+      if(e.key === "Shift"){
+        inputReference.current.focus();
+      }
+      if(e.key === "Delete"){
+        closeModal();
+      }
+  }
+ //console.log("Cliked Key: ", e.key)
+
+const closeModal = () => {
+  setReceiptModal(false);
+  setAddItemModal( false);
+  setCheckOutModal( false );
+  setCheckOutModal( false );
+  setAmountDueModal(false);
+  inputReference.current.focus();
+}
 
 useEffect(() => {
   inputReference.current.focus();
@@ -107,12 +145,35 @@ const  handleSubmit = (e) => {
   };
 
 const handleCheckout = () => {
-      var items = itemState.items;
-      dispatch(createTransaction({items, toast, navigate}));
-      setItemState({items:[]});
-      inputReference.current.focus();
+  setCheckOutModal(true);
 }
-  
+
+//console.log("resp",itemState.checkOutModal);
+const handleSaveToDB = () => {
+      var items = itemState.items;
+       if(items.length>0){
+         dispatch(createTransaction({items, toast, navigate}));
+         setItemState({items:[]});
+         inputReference.current.focus();
+       }else{
+         toast.warning("Nothing to checkout.!");
+       }
+};
+const handlePayment = (e) => {
+    e.preventDefault();
+    setCheckOutModal(false);
+     
+  if (total <= totalPayment) {
+    setItemState({...itemState, changeDue: parseInt(total, 10) - parseInt(totalPayment, 10) });
+    setReceiptModal(true);
+    handleSaveToDB(); 
+    setItemState({...itemState, items: [] });
+  } else {
+    setItemState({...itemState, changeDue: parseInt(totalPayment, 10) - parseInt(total, 10) });
+    setAmountDueModal(true);
+ }
+
+};
 const renderModal = () => {
     return (
       <Modal show={addItemModal} onEntered={() => modalReference.current.focus()}>
@@ -142,13 +203,121 @@ const renderModal = () => {
             </MDBCard>
         </Modal.Body>
         <Modal.Footer>
-          <Button  onClick={() => setAddItemModal( false)}>
+          <Button  onClick={closeModal}>
             close
           </Button>
         </Modal.Footer>
       </Modal>
     );
   };
+
+
+const renderCheckoutModal = () => {
+    return(
+      <Modal show={checkOutModal} onEntered={() => paymentModalReference.current.focus()}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Checkout</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <div ng-hide="transactionComplete" className="lead">
+                      <h3>
+                        Total:
+                        <span className="text-danger">
+                          {" "}
+                          {total}{" "}
+                        </span>
+                      </h3>
+
+                      <form
+                        className="form-horizontal"
+                        name="checkoutForm"
+                        onSubmit={handlePayment}
+                      >
+                        <div className="form-group">
+                          <div className="input-group">
+                            <div className="input-group-addon">$</div>
+                            <input
+                              type="number"
+                              id="checkoutPaymentAmount"
+                              className="form-control input-lg"
+                              name="payment"
+                              ref={paymentModalReference}
+                              onChange={e =>
+                                setItemState({...itemState,totalPayment: e.target.value})
+                              }
+                              min="0"
+                            />
+                          </div>
+                        </div>
+
+                        <p className="text-danger">Enter payment amount.</p>
+                        <div className="lead" />
+                        <Button
+                          className="btn btn-primary btn-lg lead"
+                          type="submit"
+                        >
+                          Print Receipt
+                        </Button>
+                      </form>
+                    </div>
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button
+                      onClick={closeModal}
+                    >
+                      Close
+                    </Button>
+                  </Modal.Footer>
+                </Modal>
+    )
+  }
+
+const renderAmountDue = () => {
+  return (
+    <Modal show={amountDueModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Amount</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <h3>
+          Amount Due:
+          <span className="text-danger">{itemState.changeDue}</span>
+        </h3>
+        <p>Customer payment incomplete; Correct and Try again</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={closeModal}>
+          close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+var renderReceipt = () => {
+  return (
+    <Modal show={receiptModal}>
+      <Modal.Header closeButton>
+        <Modal.Title>Receipt</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <h3>
+          Total:
+          <span className="text-danger">{totalPayment}</span>
+        </h3>
+        <h3>
+          Change Due:
+          <span className="text-danger">{itemState.changeDue}</span>
+        </h3>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={closeModal}>
+          close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
 
   const handleChange = (id, value) => {
     var items = itemState.items;
@@ -180,10 +349,11 @@ const renderModal = () => {
   }, [{handleSubmit, handleChange}]);
   return (
     <div>
-      
         <h1 style={{marginTop:"100px"}}></h1>
         {renderModal()}
-        
+        {renderCheckoutModal()}
+        {renderAmountDue()}
+        {renderReceipt()} 
              <table className="pos table table-responsive table-striped table-hover">
                  <thead>
                  <tr>
