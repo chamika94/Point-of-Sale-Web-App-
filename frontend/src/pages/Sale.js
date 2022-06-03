@@ -43,6 +43,10 @@ const initialItemstate = {
 
 const Sale = () => {
 
+const {user} = useSelector((state) => ({...state.auth}));
+
+//console.log("resp",user);
+
 const dispatch = useDispatch();
 const navigate = useNavigate();
 
@@ -151,8 +155,10 @@ const handleCheckout = () => {
 //console.log("resp",itemState.checkOutModal);
 const handleSaveToDB = () => {
       var items = itemState.items;
+      var parent = user.result.creator;
        if(items.length>0){
-         dispatch(createTransaction({items, toast, navigate}));
+        // console.log("parent",parent);
+         dispatch(createTransaction({items, parent, total, toast, navigate}));
          setItemState({items:[]});
          inputReference.current.focus();
        }else{
@@ -254,8 +260,7 @@ const renderCheckoutModal = () => {
                         <div className="lead" />
                         <Button
                           className="btn btn-primary btn-lg lead"
-                          type="submit"
-                        >
+                          type="submit">
                           Print Receipt
                         </Button>
                       </form>
@@ -354,6 +359,7 @@ var renderReceipt = () => {
         {renderCheckoutModal()}
         {renderAmountDue()}
         {renderReceipt()} 
+        
              <table className="pos table table-responsive table-striped table-hover">
                  <thead>
                  <tr>
@@ -393,9 +399,9 @@ var renderReceipt = () => {
             </div>
 
 <br></br>
-
-          
+     
 <div
+      className="search-result2"
       style={{
         margin:"auto",
         padding: "15px",
@@ -416,7 +422,8 @@ var renderReceipt = () => {
             </thead>
             <tbody> {renderLivePos()} </tbody>
           </Table> 
-    </div>         
+    </div>    
+        
           <div >
           <button
                 className="btn btn-success lead"

@@ -88,7 +88,7 @@ const AddEditTour = () => {
         padding: "15px",
         maxWidth: "450px",
         alignContent: "center",
-        marginTop: "120px",
+        marginTop: "80px",
       }}
       className="container"
     >

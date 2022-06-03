@@ -100,7 +100,7 @@ const tourSlice = createSlice({
     error: "",
     loading: false,
   },
-
+  
   extraReducers: {
     [createTour.pending]: (state, action) => {
       state.loading = true;

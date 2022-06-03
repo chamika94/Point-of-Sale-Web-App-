@@ -104,7 +104,6 @@ h4:after {
   font-size: 14px;
 }
 
-
 /* autocomplete*/
 .search-bar-container {
   width: 760px;
@@ -144,6 +143,20 @@ h4:after {
   max-height: 250px;
   overflow-y: auto;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.28);
+}
+.search-result1 {
+  position: absolute;
+  max-height: 450px;
+  overflow-y: auto;
+  width: 85%;
+
+}
+.search-result2 {
+
+  max-height: 220px;
+  overflow-y: auto;
+ 
+
 }
 .list-group-item {
   cursor: pointer;

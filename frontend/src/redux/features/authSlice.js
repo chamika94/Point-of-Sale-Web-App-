@@ -8,16 +8,37 @@ export const login = createAsyncThunk("auth/login",async({formValue, navigate, t
       navigate("/");
       return response.data;
     }catch(err){
-        return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response.data);
     }
 });
 
 export const register = createAsyncThunk("auth/register",async({formValue, navigate, toast},{rejectWithValue})=>{
     try{
-      const response = await api.signUp(formValue);
-      toast.success("Register Successfully");
-      navigate("/");
-      return response.data;
+        const response = await api.signUp(formValue);
+        toast.success("Employee Added Successfully");
+        navigate("/");
+        return response.data;
+    }catch(err){
+        return rejectWithValue(err.response.data);
+    }
+});
+
+export const getEmployee = createAsyncThunk("auth/getEmployee",async(_,{rejectWithValue})=>{
+    try{
+       
+        const response = await api.getEmployee();
+        return response.data;
+    }catch(err){
+        return rejectWithValue(err.response.data);
+    }
+});
+
+export const deleteEmployee = createAsyncThunk("auth/deleteEmployee",async(empId,{rejectWithValue})=>{
+    try{
+       
+        const response = await api.deleteEmployee(empId);
+        return response.data;
+
     }catch(err){
         return rejectWithValue(err.response.data);
     }
@@ -30,8 +51,8 @@ export const googleSignIn = createAsyncThunk(
         const response = await api.GoogleSignIn(result);
         toast.success("Google Sign-in Successfully");
         navigate("/");
-        
         return response.data;
+
       } catch (err) {
         return rejectWithValue(err.response.data);
       }
@@ -41,6 +62,7 @@ export const googleSignIn = createAsyncThunk(
 const authSlice = createSlice({
     name:"Auth",
     initialState:{
+        employee:null,
         user:null,
         error:"",
         loading: false,
@@ -73,14 +95,14 @@ const authSlice = createSlice({
         },
         [register.fulfilled]:(state, action) => {
             state.loading = false;
-            localStorage.setItem("profile",JSON.stringify({...action.payload}));
-            state.user = action.payload;
+           // localStorage.setItem("profile",JSON.stringify({...action.payload}));
+           // state.user = action.payload;
         },
         [register.rejected]:(state,action) => {
             state.loading = false;
             state.error = action.payload.message;
         },
-//==================================================================================
+//===================================================================================
         [googleSignIn.pending]:(state, action) => {
             state.loading=true;
         },
@@ -93,6 +115,38 @@ const authSlice = createSlice({
             state.loading = false;
             state.error = action.payload.message;
         },
+
+//===================================================================================
+
+          [deleteEmployee.pending]: (state, action) => {
+            state.loading = true;
+          },
+          [deleteEmployee.fulfilled]: (state, action) => {
+            //console.log("action",action);
+            state.loading = false;
+            const {arg} = action.meta;
+            if(arg){
+              state.employee = state.employee.filter((emp) => emp._id !== arg );
+            }
+          },
+          [deleteEmployee.rejected]: (state, action) => {
+            state.loading = false;
+            state.error = action.payload.message;
+          },
+//===================================================================================
+        [getEmployee.pending]:(state, action) => {
+            state.loading=true;
+        },
+        [getEmployee.fulfilled]:(state, action) => {
+            //console.log("action",action);
+            state.loading = false;
+            state.employee = action.payload.result;
+        },
+        [getEmployee.rejected]:(state,action) => {
+            state.loading = false;
+            state.error = action.payload.message;
+        },  
+            
     },
 });
 

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import  Jwt  from "jsonwebtoken";
-
+import mongoose from "mongoose";
 import UserModal from "../models/user.js";
 const secret = "test";
 
@@ -16,7 +16,7 @@ export const signin = async (req, res) => {
        if(!isPasswordCorrect)
          return res.status(400).json( {message:"Invalid credentials"});
 
-       const token = Jwt.sign({ email: oldUser.email, id: oldUser._id }, secret,{expiresIn:"1h"});
+       const token = Jwt.sign({ email: oldUser.email, id: oldUser._id }, secret,{expiresIn:"24h"});
        
        res.status(200).json({result: oldUser,token});
         
@@ -27,7 +27,8 @@ export const signin = async (req, res) => {
 }
 
 export const signup = async (req, res) => {
-    const {email,password, firstName, lastName} = req.body;
+    const {email,password, firstName, lastName, isManager, isCashier, creator} = req.body;
+    
     try{
         const oldUser = await UserModal.findOne({email});
         if(oldUser){
@@ -38,8 +39,11 @@ export const signup = async (req, res) => {
 
         const result = await UserModal.create({
             email,
+            isManager,
+            isCashier,
             password:hashePassword,
-            name:`${firstName} ${lastName}`
+            name:`${firstName} ${lastName}`,
+            creator:creator
         });
 
         const token = Jwt.sign({email:result.email,id: result.id},secret,{expiresIn:"1h"})
@@ -49,6 +53,34 @@ export const signup = async (req, res) => {
         console.log(error);
     }
 }
+
+
+export const getEmployee = async (req, res) => {
+
+  try{
+      const employee = await UserModal.find();
+        res.status(200).json({result: employee});
+  }catch(error){
+        res.status(404).json({ message:"Something went wrong"}); 
+ 
+  }
+}
+
+export const deleteEmployee = async (req, res) => {
+  const {id} = req.params;
+  try {
+      if(!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(404).json({ message: `No Employee exist with id: ${id}` });
+      }else{
+          await UserModal.findByIdAndRemove(id);  
+          res.status(200).json({ message: "Employee delete successfully.!"});
+      }  
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
 
 export const googleSignIn = async (req, res) => {
     const { email, name, token, googleId } = req.body;

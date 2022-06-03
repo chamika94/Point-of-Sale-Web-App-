@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 
 const saleSchema = mongoose.Schema({
+    TransactionNumber:Number,
     itemName:String,
     quantity: Number,
     price: Number,
-    creator: String,
+    parent:String,
+    creator:String,
     createAt:{
         type: Date,
         default: new Date(),

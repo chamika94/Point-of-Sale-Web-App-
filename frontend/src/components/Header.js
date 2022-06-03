@@ -15,8 +15,6 @@ import { setLogout } from '../redux/features/authSlice';
 import { Link } from "react-router-dom";
 
 const Header = () => {
- 
-
     const dispatch = useDispatch();
     const [show, setShow] = useState(false);
     const {user} = useSelector((state)=>({...state.auth}));
@@ -40,15 +38,77 @@ const Header = () => {
            onClick={() => setShow(!show)}
            style={{ color:"#F2F7FD"}}
           >
-           <MDBIcon icon="bars" fas />   
+          <MDBIcon icon="bars" fas />   
           </MDBNavbarToggler>
           <MDBCollapse show={show} navbar>
           <MDBNavbarNav right fullWidth={false} className="mb-2 mb-lg-0">
-          {user?.result?._id && (
-              <h5 style={{ marginRight: "30px", marginTop: "23px" ,color:"#BEC5CE"}}>
-                Logged in as: {user?.result?.name}
+
+          {user?.result?.isMainAdmin && (
+            <>
+              <h5 style={{ marginAlign:"auto", marginRight: "160px", marginTop: "23px" ,color:"#BEC5CE"}}>
+                Admin: {user?.result?.name}
               </h5>
-            )}
+                    <MDBNavbarItem >
+                    <MDBNavbarLink >
+                        <Link to={`/dashboardAdmin`}><p style={{ color:"#F2F7FD"}} className='header-text'>Dashboard</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem>    
+                    <MDBNavbarItem >
+                    <MDBNavbarLink>
+                       <Link to={'/employee'}><p style={{ color:"#F2F7FD"}} className='header-text'>Employee</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem>  
+                    <MDBNavbarItem >
+                    <MDBNavbarLink>
+                       <Link to={'/addTour'}><p style={{ color:"#F2F7FD"}} className='header-text'>Add Item</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem>                     
+            </>                                       
+          )}
+          {user?.result?.isManager && (
+             <>
+              <h5 style={{ marginAlign:"auto", marginRight: "100px", marginTop: "23px" ,color:"#BEC5CE"}}>
+                Manager: {user?.result?.name}
+              </h5>
+                   
+                    <MDBNavbarItem >
+                    <MDBNavbarLink >
+                        <Link to={`/dashboard`}><p style={{ color:"#F2F7FD"}} className='header-text'>Dashboard</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem> 
+                    <MDBNavbarItem >
+                    <MDBNavbarLink>
+                       <Link to={'/employee'}><p style={{ color:"#F2F7FD"}} className='header-text'>Employee</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem>
+                    <MDBNavbarItem >
+                    <MDBNavbarLink>
+                       <Link to={'/addTour'}><p style={{ color:"#F2F7FD"}} className='header-text'>Add Item</p></Link>  
+                    </MDBNavbarLink>
+                    </MDBNavbarItem>  
+                    
+                    <MDBNavbarItem >
+                      <MDBNavbarLink >
+                        <Link to={`/sale`}><p style={{ color:"#F2F7FD"}} className='header-text'>Sales</p></Link>  
+                      </MDBNavbarLink>
+                    </MDBNavbarItem> 
+
+                </>
+
+
+          )}  
+          {user?.result?.isCashier && (
+            <>
+              <h5 style={{ marginAlign:"auto", marginRight: "250px", marginTop: "23px" ,color:"#BEC5CE"}}>
+                Cashier: {user?.result?.name}
+              </h5>
+                    <MDBNavbarItem >
+                    <MDBNavbarLink >
+                      <Link to={`/sale`}><p style={{ color:"#F2F7FD"}} className='header-text'>Sales</p></Link>  
+                    </MDBNavbarLink>
+                  </MDBNavbarItem>  
+            </>                   
+          )}                            
                 <MDBNavbarItem >
                     <MDBNavbarLink>
                     <Link to={'/'}><p style={{ color:"#F2F7FD"}} className='header-text'>Home</p></Link>
@@ -56,22 +116,7 @@ const Header = () => {
                 </MDBNavbarItem>
 
                 {user?.result?._id ? (
-                  <>
-                <MDBNavbarItem >
-                    <MDBNavbarLink>
-                    <Link to={'/addTour'}><p style={{ color:"#F2F7FD"}} className='header-text'>Add Item</p></Link>  
-                    </MDBNavbarLink>
-                </MDBNavbarItem>
-                <MDBNavbarItem >
-                    <MDBNavbarLink >
-                        <Link to={`/dashboard`}><p style={{ color:"#F2F7FD"}} className='header-text'>Dashboard</p></Link>  
-                    </MDBNavbarLink>
-                </MDBNavbarItem> 
-                <MDBNavbarItem >
-                    <MDBNavbarLink >
-                        <Link to={`/sale`}><p style={{ color:"#F2F7FD"}} className='header-text'>Sales</p></Link>  
-                    </MDBNavbarLink>
-                </MDBNavbarItem>                                 
+                  <>                               
                 <MDBNavbarItem >
                     <MDBNavbarLink  onClick={() => handleLogout()}>
                     <Link to={'/'}><p style={{ color:"#F2F7FD"}} className='header-text'>Logout</p></Link>  
@@ -87,8 +132,6 @@ const Header = () => {
                 </MDBNavbarItem>
                   </>
                 )}
-
-
              </MDBNavbarNav>
           </MDBCollapse>
       </MDBContainer>
